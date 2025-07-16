@@ -9,7 +9,7 @@ spring:
     open-in-view: false
 
 server:
-  port: 8080
+  port: 8082
   servlet.context-path: /api/user/v1
   
 management:
@@ -52,7 +52,7 @@ redirect:
 
 spring:
   config:
-    import: aws-secretsmanager:application_dev
+    # import: aws-secretsmanager:application_dev
     activate:
       on-profile: dev
   cloud.aws.region.static: us-east-2

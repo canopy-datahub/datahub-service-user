@@ -11,7 +11,7 @@ spring:
 server:
   port: 8082
   servlet.context-path: /api/user/v1
-  
+
 management:
   endpoint:
     health:
@@ -52,7 +52,7 @@ redirect:
 
 spring:
   config:
-    # import: aws-secretsmanager:application_dev
+    #import: aws-secretsmanager:application_dev
     activate:
       on-profile: dev
   cloud.aws.region.static: us-east-2
@@ -76,7 +76,7 @@ spring:
     import: aws-secretsmanager:application_test
     activate:
       on-profile: test
-      
+
   cloud.aws.region.static: us-east-1
 
 logging:

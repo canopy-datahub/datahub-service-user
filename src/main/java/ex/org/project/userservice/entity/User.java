@@ -25,13 +25,13 @@ public class User {
 
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "middle_initial")
     private String middleInitial;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "email_address")
     private String email;
 
@@ -66,7 +66,7 @@ public class User {
             CascadeType.PERSIST,
             CascadeType.MERGE
     })
-    
+
     @Fetch(FetchMode.JOIN)
     @JoinTable(
             name = "user_role",
@@ -79,8 +79,8 @@ public class User {
     private Boolean dhpUser;
 
     @ManyToOne
-    @JoinColumn(name = "dcc_id")
-    private LkupDCC dcc;
+    @JoinColumn(name = "center_id")
+    private LkupCenter center;
 
     @PreUpdate
     public void setUpdatedAt() {
@@ -107,7 +107,7 @@ public class User {
     }
 
     public void updateUser(UserDTO userDTO, Institution institution, List<Role> roles,
-                           LookupStatus status, LookupResearcherLevel researcherLevel, LkupDCC dcc) {
+                           LookupStatus status, LookupResearcherLevel researcherLevel, LkupCenter center) {
         this.firstName = userDTO.getFirstName().trim();
         this.middleInitial = userDTO.getMiddleInitial();
         this.lastName = userDTO.getLastName().trim();
@@ -118,7 +118,7 @@ public class User {
         this.roles = roles;
         this.dhpUser = userDTO.getDhpUser();
         this.researcherLevel = researcherLevel;
-        this.dcc = dcc;
+        this.center = center;
     }
 
     public void updateUser(String jobTitle, String orcidId, Institution institution, LookupResearcherLevel researcherLevel) {

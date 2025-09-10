@@ -8,11 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.net.URISyntaxException;
 import java.util.stream.Collectors;
@@ -169,14 +167,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseDTO, status);
     }
 
-    @ExceptionHandler(SubmitterDccException.class)
-    ResponseEntity<ExceptionResponseDTO> handleSubmitterDccException(SubmitterDccException e) {
+    @ExceptionHandler(SubmitterCenterException.class)
+    ResponseEntity<ExceptionResponseDTO> handleSubmitterCenterException(SubmitterCenterException e) {
         log.warn(e.getMessage(), e);
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ExceptionResponseDTO responseDTO = new ExceptionResponseDTO(
-                "Submitter DCC Exception",
+                "Submitter Center Exception",
                 status.value(),
-                String.format("A user with the role of Data Submitter must be aligned to a valid DCC. %s", e.getMessage())
+                String.format("A user with the role of Data Submitter must be aligned to a valid center. %s", e.getMessage())
         );
         return new ResponseEntity<>(responseDTO, status);
     }

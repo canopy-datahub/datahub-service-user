@@ -3,13 +3,13 @@ package ex.org.project.userservice.service;
 import java.util.List;
 
 import ex.org.project.userservice.dto.*;
-import ex.org.project.userservice.entity.LkupDCC;
+import ex.org.project.userservice.entity.LkupCenter;
 import ex.org.project.userservice.entity.Role;
 
 public interface UserService {
 
     UserDTO getUserInfo(String emailAddress);
-    
+
     UserDTO getUserInfoBySession(String session);
 
     List<InstitutionDTO> getApprovedInstitutions();
@@ -25,8 +25,8 @@ public interface UserService {
     List<LookupStateDTO> getAllStates();
 
     List<LookupCountryDTO> getAllCountries();
-    
-    List<LkupDCC> getAllDCCs();
+
+    List<LkupCenter> getAllCenters();
 
     List<UserDTO> getUsersByStatus(String status);
 

@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class UserDTO {
 	private String status;
 	private Boolean dhpUser;
 	private String researcherLevel;
-	private String dcc;
+	private String center;
 	private String redirectUrl;
 	private ZonedDateTime createdAt;
 	private ZonedDateTime updateAt;

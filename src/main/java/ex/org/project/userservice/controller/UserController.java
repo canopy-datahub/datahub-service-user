@@ -5,7 +5,7 @@ import java.util.List;
 import ex.org.project.userservice.auth.AccessRole;
 import ex.org.project.userservice.auth.UserAuthService;
 import ex.org.project.userservice.dto.*;
-import ex.org.project.userservice.entity.LkupDCC;
+import ex.org.project.userservice.entity.LkupCenter;
 import ex.org.project.userservice.entity.Role;
 import ex.org.project.userservice.util.RequestValidator;
 import jakarta.validation.Valid;
@@ -94,10 +94,10 @@ public class UserController {
         List<LookupCountryDTO> countries = userService.getAllCountries();
         return ResponseEntity.ok(countries);
     }
-    
-    @GetMapping("/dccs")
-    public ResponseEntity<List<LkupDCC>> getAllDCCs() {
-        List<LkupDCC> dccs = userService.getAllDCCs();
+
+    @GetMapping("/centers")
+    public ResponseEntity<List<LkupCenter>> getAllCenters() {
+        List<LkupCenter> dccs = userService.getAllCenters();
         return ResponseEntity.ok(dccs);
     }
 

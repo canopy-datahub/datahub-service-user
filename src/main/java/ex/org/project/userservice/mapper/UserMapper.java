@@ -18,20 +18,20 @@ public interface UserMapper {
 	@Mapping(target = "jobTitle", source = "jobTitle")
 	@Mapping(target = "status", source = "status.name")
 	@Mapping(target = "researcherLevel", source = "user.researcherLevel.name")
-	@Mapping(target = "dcc", source = "user.dcc.name")
+	@Mapping(target = "center", source = "user.center.name")
 	UserDTO toUserDto(User user);
-	
+
 	@Mapping(target = "institution", source = "user.institution.name")
 	@Mapping(target = "roles", source = "user.roles", qualifiedByName = "extractRoles")
 	@Mapping(target = "jobTitle", source = "user.jobTitle")
 	@Mapping(target = "status", source = "user.status.name")
 	@Mapping(target = "sessionID", source = "session")
 	@Mapping(target = "researcherLevel", source = "user.researcherLevel.name")
-	@Mapping(target = "dcc", source = "user.dcc.name")
+	@Mapping(target = "center", source = "user.center.name")
 	UserDTO toUserDto(User user, String session);
 
 	List<UserDTO> toUserDTOs(List<User> users);
-	
+
     @Named("extractRoles")
 	static List<String> extractRoles(List<Role> roles){
 		return roles.stream().map(Role::getName).toList();

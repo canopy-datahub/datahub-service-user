@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 	private final LookupStateRepository lookupStateRepository;
 	private final LookupRoleRepository lookupRoleRepository;
 	private final AuthRasTrackingRepository rasTrackingRepository;
-	private final LkupDCCRepository dccRepository;
+	private final LkupCenterRepository centerRepository;
 	private final MessageService messageService;
 	private final LkupReferrerRepository lkupReferrerRepository;
 	private final UserReferrerRepository userReferrerRepository;
@@ -163,9 +163,9 @@ public class UserServiceImpl implements UserService {
 				.map(lookupCountryMapper::toCountryDto)
 				.toList();
 	}
-	
-	public List<LkupDCC> getAllDCCs(){
-		return dccRepository.findAll();
+
+	public List<LkupCenter> getAllCenters(){
+		return centerRepository.findAll();
 	}
 
 	public List<UserDTO> getUsersByStatus(String status) {
@@ -193,15 +193,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional
-	public UserDTO updateUserInfo(Integer id, UserDTO userDTO) throws SubmitterDccException, UserInfoException {
+	public UserDTO updateUserInfo(Integer id, UserDTO userDTO) throws SubmitterCenterException, UserInfoException {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new UserNotFoundException("Unable to find user with provided ID"));
 
 		boolean isSubmitter = userDTO.getRoles()
 				.stream()
 				.anyMatch(role -> role.equals(AccessRole.DATA_SUBMITTER.label));
-		if(isSubmitter && (userDTO.getDcc() == null || userDTO.getDcc().isBlank())) {
-			throw new SubmitterDccException("Provided DCC field is blank.");
+		if(isSubmitter && (userDTO.getCenter() == null || userDTO.getCenter().isBlank())) {
+			throw new SubmitterCenterException("Provided Center field is blank.");
 		}
 
 		List<Role> roles = lookupRoleRepository.findAllByNameIn(userDTO.getRoles());
@@ -216,13 +216,13 @@ public class UserServiceImpl implements UserService {
 		LookupResearcherLevel researcherLevel = lookupResearcherLevelRepository.findByName(userDTO.getResearcherLevel())
 				.orElseThrow(() -> new UserInfoException("Invalid researcher level"));
 
-		LkupDCC dcc = null;
-		if(userDTO.getDcc() != null && !userDTO.getDcc().isBlank()) {
-			dcc = dccRepository.findByName(userDTO.getDcc())
+		LkupCenter center = null;
+		if(userDTO.getCenter() != null && !userDTO.getCenter().isBlank()) {
+			center = centerRepository.findByName(userDTO.getCenter())
 					.orElseThrow(() -> new UserInfoException("DCC not found"));
 		}
 
-		user.updateUser(userDTO, institution, roles, status, researcherLevel, dcc);
+		user.updateUser(userDTO, institution, roles, status, researcherLevel, center);
 		return userMapper.toUserDto(user);
 	}
 
@@ -231,7 +231,7 @@ public class UserServiceImpl implements UserService {
 		// 		.orElseThrow(
 		// 				() -> new UserNotFoundException("Session not found"));
 		AuthRasTracking rasUser = new AuthRasTracking();
-		rasUser.setEmail("test@test.com");
+		rasUser.setEmail("ycao77@stanford.edu");
 
 		if(rasUser.getEmail() == null) {
 			throw new BadDataException("Session ID is missing a valid email address");
@@ -243,7 +243,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional
-	public UserDTO editProfile(Integer id, UserDTO userDTO) throws SubmitterDccException, UserInfoException {
+	public UserDTO editProfile(Integer id, UserDTO userDTO) throws SubmitterCenterException, UserInfoException {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new UserNotFoundException("Unable to find user with provided ID"));
 

@@ -46,7 +46,7 @@ class UserServiceImplTests {
     @Mock private LookupStateRepository lookupStateRepository;
     @Mock private LookupRoleRepository lookupRoleRepository;
     @Mock private AuthRasTrackingRepository rasTrackingRepository;
-    @Mock private LkupDCCRepository dccRepository;
+    @Mock private LkupCenterRepository dccRepository;
     @Mock private MessageService messageService;
     @Mock private LkupReferrerRepository referrerRepository;
     @Mock private UserReferrerRepository userReferrerRepository;
@@ -60,7 +60,7 @@ class UserServiceImplTests {
         userDto.setLastName("McTestington");
         userDto.setEmail("test@bah.com");
         userDto.setInstitution("Booz Allen Hamilton");
-        userDto.setDcc("RADx Tech");
+        userDto.setCenter("RADx Tech");
         userDto.setResearcherLevel("Doctor of PhDs");
         userDto.setJobTitle("President of Space");
         userDto.setRoles(List.of(AccessRole.DATA_SUBMITTER.label));
@@ -83,7 +83,7 @@ class UserServiceImplTests {
         status.setName("active");
         LookupResearcherLevel researcherLevel = new LookupResearcherLevel();
         researcherLevel.setName("Doctor of PhDs");
-        LkupDCC dcc = new LkupDCC();
+        LkupCenter dcc = new LkupCenter();
         dcc.setName("RADx Tech");
 
         when(userRepository.findById(userId))
@@ -96,7 +96,7 @@ class UserServiceImplTests {
                 .thenReturn(Optional.of(status));
         when(lookupResearcherLevelRepository.findByName(userDTO.getResearcherLevel()))
                 .thenReturn(Optional.of(researcherLevel));
-        when(dccRepository.findByName(userDTO.getDcc()))
+        when(dccRepository.findByName(userDTO.getCenter()))
                 .thenReturn(Optional.of(dcc));
 
         UserDTO response = userService.updateUserInfo(userId, userDTO);
@@ -105,7 +105,7 @@ class UserServiceImplTests {
         assertEquals("Booz Allen Hamilton", response.getInstitution());
         assertEquals("active", response.getStatus());
         assertEquals("Doctor of PhDs", response.getResearcherLevel());
-        assertEquals("RADx Tech", response.getDcc());
+        assertEquals("RADx Tech", response.getCenter());
         assertEquals("test@bah.com", response.getEmail());
         assertEquals("Test", response.getFirstName());
         assertEquals("McTestington", response.getLastName());
@@ -116,7 +116,7 @@ class UserServiceImplTests {
     void updateUserInfo_NullDccNonSubmitter(){
         Integer userId = 1;
         UserDTO userDTO = getUserDto();
-        userDTO.setDcc(null);
+        userDTO.setCenter(null);
         userDTO.setRoles(List.of());
         User user = new User();
         user.setId(userId);
@@ -126,7 +126,7 @@ class UserServiceImplTests {
         status.setName("active");
         LookupResearcherLevel researcherLevel = new LookupResearcherLevel();
         researcherLevel.setName("Doctor of PhDs");
-        LkupDCC dcc = new LkupDCC();
+        LkupCenter dcc = new LkupCenter();
         dcc.setName("RADx Tech");
 
         when(userRepository.findById(userId))
@@ -147,7 +147,7 @@ class UserServiceImplTests {
         assertEquals("Booz Allen Hamilton", response.getInstitution());
         assertEquals("active", response.getStatus());
         assertEquals("Doctor of PhDs", response.getResearcherLevel());
-        assertNull(response.getDcc());
+        assertNull(response.getCenter());
         assertEquals("test@bah.com", response.getEmail());
         assertEquals("Test", response.getFirstName());
         assertEquals("McTestington", response.getLastName());
@@ -158,7 +158,7 @@ class UserServiceImplTests {
     void updateUserInfo_NullDccSubmitter(){
         Integer userId = 1;
         UserDTO userDTO = getUserDto();
-        userDTO.setDcc(null);
+        userDTO.setCenter(null);
         User user = new User();
         user.setId(userId);
         Role role = new Role();
@@ -169,13 +169,13 @@ class UserServiceImplTests {
         status.setName("active");
         LookupResearcherLevel researcherLevel = new LookupResearcherLevel();
         researcherLevel.setName("Doctor of PhDs");
-        LkupDCC dcc = new LkupDCC();
+        LkupCenter dcc = new LkupCenter();
         dcc.setName("RADx Tech");
 
         when(userRepository.findById(userId))
                 .thenReturn(Optional.of(user));
 
-        assertThrows(SubmitterDccException.class, () -> userService.updateUserInfo(userId, userDTO));
+        assertThrows(SubmitterCenterException.class, () -> userService.updateUserInfo(userId, userDTO));
     }
 
     @Test
@@ -192,12 +192,12 @@ class UserServiceImplTests {
     void updateUserInfo_SetSubmitterWithBlankDcc(){
         Integer userId = 1;
         UserDTO userDTO = getUserDto();
-        userDTO.setDcc("");
+        userDTO.setCenter("");
 
         when(userRepository.findById(userId))
                 .thenReturn(Optional.of(new User()));
 
-        assertThrows(SubmitterDccException.class, () -> userService.updateUserInfo(userId, userDTO));
+        assertThrows(SubmitterCenterException.class, () -> userService.updateUserInfo(userId, userDTO));
     }
 
     @Test
@@ -258,7 +258,7 @@ class UserServiceImplTests {
                 .thenReturn(Optional.of(new LookupStatus()));
         when(lookupResearcherLevelRepository.findByName(userDTO.getResearcherLevel()))
                 .thenReturn(Optional.of(new LookupResearcherLevel()));
-        when(dccRepository.findByName(userDTO.getDcc()))
+        when(dccRepository.findByName(userDTO.getCenter()))
                 .thenReturn(Optional.empty());
 
         assertThrows(UserInfoException.class, () -> userService.updateUserInfo(userId, userDTO));

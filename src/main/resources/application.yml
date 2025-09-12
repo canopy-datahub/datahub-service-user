@@ -55,7 +55,7 @@ spring:
     #import: aws-secretsmanager:application_dev
     activate:
       on-profile: dev
-  cloud.aws.region.static: us-east-2
+  cloud.aws.region.static: us-west-2
   jpa:
     show-sql: true
 
@@ -77,7 +77,7 @@ spring:
     activate:
       on-profile: test
 
-  cloud.aws.region.static: us-east-1
+  cloud.aws.region.static: us-west-2
 
 logging:
   pattern:

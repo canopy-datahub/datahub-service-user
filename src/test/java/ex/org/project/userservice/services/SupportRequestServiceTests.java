@@ -49,7 +49,7 @@ public class SupportRequestServiceTests {
     @Mock
     private UserRoleRepository userRoleRepository;
     @Spy
-    private SupportRequestMapper supportRequestMapper = new SupportRequestMapperImpl();
+    private SupportRequestMapperImpl supportRequestMapper = new SupportRequestMapperImpl();
     @Mock
     private SupportAssigneeMapper supportAssigneeMapper;
     @Mock

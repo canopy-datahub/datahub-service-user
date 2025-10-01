@@ -31,9 +31,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTests {
 
-    @Spy private UserMapper userMapper = new UserMapperImpl();
-    @Spy private UserRegistrationMapper userRegistrationMapper = new UserRegistrationMapperImpl();
-    @Spy private InstitutionMapper institutionMapper = new InstitutionMapperImpl();
+    @Spy private UserMapperImpl userMapper = new UserMapperImpl();
+    @Spy private UserRegistrationMapperImpl userRegistrationMapper = new UserRegistrationMapperImpl();
+    @Spy private InstitutionMapperImpl institutionMapper = new InstitutionMapperImpl();
 
     @Mock private LookupStateMapper lookupStateMapper;
     @Mock private LookupCountryMapper lookupCountryMapper;

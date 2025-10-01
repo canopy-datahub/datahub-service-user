@@ -31,8 +31,6 @@ class UserAuthServiceTests {
     @Mock
     private AuthUtilRepository authUtilRepository;
 
-    private final AuthUserMapper authUserMapper = new AuthUserMapperImpl();
-
     private UserAuthService userAuthService;
 
     @Mock

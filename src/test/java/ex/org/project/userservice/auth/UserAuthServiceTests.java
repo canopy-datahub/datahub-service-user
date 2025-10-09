@@ -20,9 +20,6 @@ import static org.mockito.Mockito.when;
 class UserAuthServiceTests {
 
     @Mock
-    private AuthRasTrackingRepository authRasTrackingRepository;
-
-    @Mock
     private AuthUserRepository authUserRepository;
 
     @Mock
@@ -33,12 +30,9 @@ class UserAuthServiceTests {
 
     private UserAuthService userAuthService;
 
-    @Mock
-    private AuthRasService authRasService;
-
     @BeforeEach
     public void setup() {
-        userAuthService = new UserAuthService(authUserRasRepository, authUtilRepository, authRasService);
+        userAuthService = new UserAuthService(authUserRasRepository, authUtilRepository);
     }
 
     @Test
@@ -46,9 +40,6 @@ class UserAuthServiceTests {
         AuthUserDTO authUserDto = new AuthUserDTO();
         authUserDto.setRoles(List.of("Application Administrator"));
         authUserDto.setId(8);
-
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUserDto);
 
         Integer response = userAuthService.checkAuth("123", List.of(AccessRole.ADMIN));
 
@@ -62,9 +53,6 @@ class UserAuthServiceTests {
         authUserDto.setRoles(List.of("fake role"));
         authUserDto.setId(8);
 
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUserDto);
-
         Integer response = userAuthService.checkAuth("123", List.of());
 
         assertEquals(8, response);
@@ -76,9 +64,6 @@ class UserAuthServiceTests {
         authUserDto.setRoles(List.of("fake role"));
         authUserDto.setId(8);
 
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUserDto);
-
         assertThrows(UserAuthorizationException.class,
                 () -> userAuthService.checkAuth("123", List.of(AccessRole.ADMIN)));
     }
@@ -89,9 +74,6 @@ class UserAuthServiceTests {
         authUser.setRoles(List.of("Admin"));
         authUser.setStatus("active");
         authUser.setId(8);
-
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUser);
 
         Integer response = userAuthService.checkAuth("123");
 

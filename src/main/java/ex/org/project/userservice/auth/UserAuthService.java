@@ -4,13 +4,19 @@ import ex.org.project.userservice.auth.ras.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated This service is deprecated. Use UserAuthenticationService instead for JWT-based authentication.
+ * This class is kept for reference during the Keycloak migration.
+ * 
+ * File authorization (checkFileAuthorization) may still be needed and should be extracted to a separate service.
+ */
+@Deprecated
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,7 +24,6 @@ public class UserAuthService {
 
     private final AuthUserRasRepository authUserRasRepository;
     private final AuthUtilRepository authUtilRepository;
-    private final AuthRasService authRasService;
 
 
     /**

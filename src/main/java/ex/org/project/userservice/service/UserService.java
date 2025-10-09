@@ -10,13 +10,11 @@ public interface UserService {
 
     UserDTO getUserInfo(String emailAddress);
 
-    UserDTO getUserInfoBySession(String session);
-
     List<InstitutionDTO> getApprovedInstitutions();
 
     InstitutionDTO createInstitution(InstitutionDTO institutionDTO);
 
-    UserRegistrationDTO saveUserRegistrationForm(String sessionId, UserRegistrationDTO userRegistrationDTO);
+    UserRegistrationDTO saveUserRegistrationForm(Integer userId, UserRegistrationDTO userRegistrationDTO);
 
     List<String> getResearcherLevels();
 

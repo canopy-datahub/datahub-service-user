@@ -1,38 +1,30 @@
 package ex.org.project.userservice.service;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import ex.org.project.userservice.auth.AccessRole;
-import ex.org.project.userservice.auth.UserNotFoundException;
+import ex.org.project.datahub.auth.exception.UserNotFoundException;
+import ex.org.project.datahub.auth.model.AccessRole;
 import ex.org.project.userservice.dto.EmailRequest;
+import ex.org.project.userservice.dto.SupportAssigneeDTO;
+import ex.org.project.userservice.dto.SupportRequestDTO;
 import ex.org.project.userservice.dto.UserDTO;
+import ex.org.project.userservice.entity.*;
 import ex.org.project.userservice.exception.*;
+import ex.org.project.userservice.mapper.SupportAssigneeMapper;
+import ex.org.project.userservice.mapper.SupportRequestMapper;
+import ex.org.project.userservice.repository.*;
 import ex.org.project.userservice.util.EmailRequestType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ex.org.project.userservice.dto.SupportAssigneeDTO;
-import ex.org.project.userservice.dto.SupportRequestDTO;
-import ex.org.project.userservice.entity.LookupStatus;
-import ex.org.project.userservice.entity.LookupSupportRequestType;
-import ex.org.project.userservice.entity.ResolutionType;
-import ex.org.project.userservice.entity.SupportRequest;
-import ex.org.project.userservice.entity.UserRole;
-import ex.org.project.userservice.mapper.SupportAssigneeMapper;
-import ex.org.project.userservice.mapper.SupportRequestMapper;
-import ex.org.project.userservice.repository.LookupStatusRepository;
-import ex.org.project.userservice.repository.LookupSupportRequestTypeRepository;
-import ex.org.project.userservice.repository.ResolutionTypeRepository;
-import ex.org.project.userservice.repository.SupportRequestRepository;
-import ex.org.project.userservice.repository.UserRoleRepository;
-import lombok.RequiredArgsConstructor;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -264,13 +256,13 @@ public class SupportRequestServiceImpl implements SupportRequestService {
 		List<LookupStatus> allStatuses = lookupStatusRepository.findByUsage(SUPPORT_REQUEST);
 		return allStatuses.stream().map(LookupStatus::getName).collect(Collectors.toList());
 	}
-	
+
 	@Override
 	public List<SupportAssigneeDTO> getAllAssignees(){
 		List<UserRole> supportUsers = userRoleRepository.findByRole_Name("Support Team");
 		return supportAssigneeMapper.toDTOs(supportUsers);
 	}
-  
+
 	public String downloadSupportRequestReportsToCSV() throws IOException {
 
 		String filepath = "support_request.csv";

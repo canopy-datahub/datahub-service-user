@@ -1,19 +1,10 @@
 package controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Collections;
-import java.util.List;
-
-import ex.org.project.userservice.auth.UserAuthService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ex.org.project.datahub.auth.core.FileAuthorizationService;
+import ex.org.project.userservice.controller.SupportRequestController;
+import ex.org.project.userservice.dto.SupportRequestDTO;
+import ex.org.project.userservice.service.SupportRequestService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,11 +15,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
 
-import ex.org.project.userservice.controller.SupportRequestController;
-import ex.org.project.userservice.dto.SupportRequestDTO;
-import ex.org.project.userservice.service.SupportRequestService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class SupportRequestControllerTest {
 
@@ -38,7 +32,7 @@ public class SupportRequestControllerTest {
     private SupportRequestService supportRequestService;
 
     @Mock
-    private UserAuthService authService;
+    private FileAuthorizationService fileAuthorizationService;
 
     @InjectMocks
     private SupportRequestController supportRequestController;

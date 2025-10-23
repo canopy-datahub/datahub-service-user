@@ -1,10 +1,10 @@
 package ex.org.project.userservice.service;
 
-import java.util.List;
-
 import ex.org.project.userservice.dto.*;
 import ex.org.project.userservice.entity.LkupCenter;
 import ex.org.project.userservice.entity.Role;
+
+import java.util.List;
 
 public interface UserService {
 

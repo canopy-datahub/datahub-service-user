@@ -1,14 +1,13 @@
 package ex.org.project.userservice.mapper;
 
-import java.util.List;
-
+import ex.org.project.userservice.dto.UserDTO;
+import ex.org.project.userservice.entity.Role;
+import ex.org.project.userservice.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import ex.org.project.userservice.dto.UserDTO;
-import ex.org.project.userservice.entity.Role;
-import ex.org.project.userservice.entity.User;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

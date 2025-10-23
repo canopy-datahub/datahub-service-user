@@ -1,20 +1,20 @@
 package ex.org.project.userservice.controller;
 
-import java.util.List;
-
-import ex.org.project.userservice.auth.AccessRole;
-import ex.org.project.userservice.auth.UserAuthenticationService;
+import ex.org.project.datahub.auth.core.KeycloakAuthenticationService;
+import ex.org.project.datahub.auth.model.AccessRole;
 import ex.org.project.userservice.dto.*;
 import ex.org.project.userservice.entity.LkupCenter;
 import ex.org.project.userservice.entity.Role;
+import ex.org.project.userservice.service.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import ex.org.project.userservice.service.UserService;
-import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
-    private final UserAuthenticationService authenticationService;
+    private final KeycloakAuthenticationService authenticationService;
 
 
     @GetMapping("/admin/user")

@@ -1,6 +1,10 @@
 package ex.org.project.userservice.auth;
 
-import ex.org.project.userservice.auth.ras.*;
+import ex.org.project.datahub.auth.core.FileAuthorizationService;
+import ex.org.project.datahub.auth.exception.UserAuthorizationException;
+import ex.org.project.datahub.auth.model.AuthUserRas;
+import ex.org.project.datahub.auth.repository.AuthUserRasRepository;
+import ex.org.project.datahub.auth.repository.AuthUtilRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,18 +13,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserAuthServiceTests {
-
-    @Mock
-    private AuthUserRepository authUserRepository;
 
     @Mock
     private AuthUserRasRepository authUserRasRepository;
@@ -28,57 +28,11 @@ class UserAuthServiceTests {
     @Mock
     private AuthUtilRepository authUtilRepository;
 
-    private UserAuthService userAuthService;
+    private FileAuthorizationService fileAuthorizationService;
 
     @BeforeEach
     public void setup() {
-        userAuthService = new UserAuthService(authUserRasRepository, authUtilRepository);
-    }
-
-    @Test
-    void testCheckAuth_roles_happyPath(){
-        AuthUserDTO authUserDto = new AuthUserDTO();
-        authUserDto.setRoles(List.of("Application Administrator"));
-        authUserDto.setId(8);
-
-        Integer response = userAuthService.checkAuth("123", List.of(AccessRole.ADMIN));
-
-        assertEquals(8, response);
-
-    }
-
-    @Test
-    void testCheckAuth_roles_happyPathNoRoleRequired(){
-        AuthUserDTO authUserDto = new AuthUserDTO();
-        authUserDto.setRoles(List.of("fake role"));
-        authUserDto.setId(8);
-
-        Integer response = userAuthService.checkAuth("123", List.of());
-
-        assertEquals(8, response);
-    }
-
-    @Test
-    void testCheckAuth_roles_invalidRoles(){
-        AuthUserDTO authUserDto = new AuthUserDTO();
-        authUserDto.setRoles(List.of("fake role"));
-        authUserDto.setId(8);
-
-        assertThrows(UserAuthorizationException.class,
-                () -> userAuthService.checkAuth("123", List.of(AccessRole.ADMIN)));
-    }
-
-    @Test
-    void testCheckAuth_happyPath(){
-        AuthUserDTO authUser = new AuthUserDTO();
-        authUser.setRoles(List.of("Admin"));
-        authUser.setStatus("active");
-        authUser.setId(8);
-
-        Integer response = userAuthService.checkAuth("123");
-
-        assertEquals(8, response);
-
+        fileAuthorizationService = new FileAuthorizationService(authUserRasRepository, authUtilRepository);
     }
 
     private List<AuthUserRas> getAuthUserRasList(){
@@ -102,7 +56,7 @@ class UserAuthServiceTests {
         when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
                 .thenReturn(phsNumbersMock);
 
-        boolean response = userAuthService.checkFileAuthorization(userId, dataFileIds);
+        boolean response = fileAuthorizationService.checkFileAuthorization(userId, dataFileIds);
 
         assertTrue(response);
     }
@@ -122,7 +76,7 @@ class UserAuthServiceTests {
                 .thenReturn(phsNumbersMock);
 
         assertThrows(UserAuthorizationException.class,
-                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+                () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
         );
     }
 
@@ -141,7 +95,7 @@ class UserAuthServiceTests {
                 .thenReturn(phsNumbersMock);
 
         assertThrows(UserAuthorizationException.class,
-                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+                () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
         );
     }
 
@@ -154,7 +108,7 @@ class UserAuthServiceTests {
                 .thenReturn(new ArrayList<>());
 
         assertThrows(UserAuthorizationException.class,
-                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+                () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
         );
     }
 
@@ -167,7 +121,7 @@ class UserAuthServiceTests {
                 .thenReturn(List.of(1, 2, 3, 4));
 
         assertThrows(UserAuthorizationException.class,
-                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+                () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
         );
     }
 }

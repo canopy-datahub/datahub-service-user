@@ -1,11 +1,16 @@
 package ex.org.project.userservice.services;
 
-import ex.org.project.userservice.auth.AccessRole;
-import ex.org.project.userservice.auth.UserAuthenticationException;
-import ex.org.project.userservice.auth.UserNotFoundException;
-import ex.org.project.userservice.dto.*;
+import ex.org.project.datahub.auth.exception.UserNotFoundException;
+import ex.org.project.datahub.auth.model.AccessRole;
+import ex.org.project.userservice.dto.InstitutionDTO;
+import ex.org.project.userservice.dto.ReferrerSelectionDTO;
+import ex.org.project.userservice.dto.UserDTO;
+import ex.org.project.userservice.dto.UserRegistrationDTO;
 import ex.org.project.userservice.entity.*;
-import ex.org.project.userservice.exception.*;
+import ex.org.project.userservice.exception.InstitutionCreationException;
+import ex.org.project.userservice.exception.SubmitterCenterException;
+import ex.org.project.userservice.exception.UserInfoException;
+import ex.org.project.userservice.exception.UserRegistrationFormException;
 import ex.org.project.userservice.mapper.*;
 import ex.org.project.userservice.repository.*;
 import ex.org.project.userservice.service.MessageService;
@@ -333,10 +338,10 @@ class UserServiceImplTests {
         Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         UserRegistrationDTO dto = getUserRegistrationDto();
-        
+
         when(userRepository.existsByEmail(email))
                 .thenReturn(true);
-        
+
         assertThrows(UserRegistrationFormException.class,
                      () -> userService.saveUserRegistrationForm(userId, dto));
     }
@@ -351,7 +356,7 @@ class UserServiceImplTests {
                 .thenReturn(false);
         when(institutionRepository.findByName(dto.getInstitution()))
                 .thenReturn(Optional.empty());
-        
+
         assertThrows(UserRegistrationFormException.class,
                      () -> userService.saveUserRegistrationForm(userId, dto));
     }

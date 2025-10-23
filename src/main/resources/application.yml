@@ -46,8 +46,8 @@ logging:
         HttpEntityMethodProcessor: trace
 
 keycloak:
-  realm: ${DATAHUB_KEYCLOAK_REALM:datahub}
-  resource: ${DATAHUB_KEYCLOAK_CLIENT_ID:datahub-service-user}
+  realm: ${DATAHUB_KEYCLOAK_REALM}
+  resource: ${DATAHUB_KEYCLOAK_CLIENT_ID}
 
 # RAS configuration - DEPRECATED (kept for reference during migration)
 # ras:

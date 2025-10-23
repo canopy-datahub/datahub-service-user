@@ -1,7 +1,9 @@
 package ex.org.project.userservice.dto;
 
 import ex.org.project.userservice.util.EmailRequestType;
-import java.util.*;
+
+import java.util.List;
+import java.util.Map;
 
 public record EmailRequest(
         String type,

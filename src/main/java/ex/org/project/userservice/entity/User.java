@@ -1,17 +1,16 @@
 package ex.org.project.userservice.entity;
 
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import ex.org.project.userservice.dto.UserDTO;
 import ex.org.project.userservice.dto.UserRegistrationDTO;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import java.time.ZonedDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @AllArgsConstructor

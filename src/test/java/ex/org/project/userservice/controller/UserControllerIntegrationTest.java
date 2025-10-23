@@ -4,17 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
-import java.util.Map;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -28,7 +27,7 @@ public class UserControllerIntegrationTest {
         // Create a mock JWT with an email that exists in your database
         // IMPORTANT: Replace "test@example.com" with an actual email from your auth_user table
         String testEmail = "test.user.1@datahub.orgx";
-        
+
         Jwt jwt = Jwt.withTokenValue("mock-token")
                 .header("alg", "RS256")
                 .claim("sub", "mock-subject-123")
@@ -53,7 +52,7 @@ public class UserControllerIntegrationTest {
     public void testGetCurrentUserInfo_WithNonExistentUser_Returns404() throws Exception {
         // Email that doesn't exist in database
         String nonExistentEmail = "nonexistent@example.com";
-        
+
         Jwt jwt = Jwt.withTokenValue("mock-token")
                 .header("alg", "RS256")
                 .claim("sub", "mock-subject-456")

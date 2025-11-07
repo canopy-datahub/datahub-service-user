@@ -1,23 +1,23 @@
 package ex.org.project.userservice.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
-import ex.org.project.userservice.auth.AccessRole;
-import ex.org.project.userservice.auth.UserAuthService;
-import ex.org.project.userservice.auth.UserAuthenticationException;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import ex.org.project.datahub.auth.core.KeycloakAuthenticationService;
+import ex.org.project.datahub.auth.exception.UserAuthenticationException;
+import ex.org.project.datahub.auth.model.AccessRole;
 import ex.org.project.userservice.dto.SupportAssigneeDTO;
 import ex.org.project.userservice.dto.SupportRequestDTO;
 import ex.org.project.userservice.service.SupportRequestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class SupportRequestController {
 
     private final SupportRequestService supportRequestService;
-    private final UserAuthService authService;
+    private final KeycloakAuthenticationService authenticationService;
 
     @GetMapping("/request-types")
     public ResponseEntity<List<String>> getLookupSupportRequestType() {
@@ -34,11 +34,11 @@ public class SupportRequestController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<SupportRequestDTO> saveSupportRequest(@CookieValue(value = "chocolateChip", required = false) String sessionId,
+    public ResponseEntity<SupportRequestDTO> saveSupportRequest(@AuthenticationPrincipal Jwt jwt,
                                                                 @RequestBody SupportRequestDTO supportRequestDTO) {
         SupportRequestDTO savedRequest;
         try{
-             Integer userId = authService.checkAuth(sessionId);
+             Integer userId = authenticationService.checkAuth(jwt);
             savedRequest = supportRequestService.saveLoggedInUserSupportRequest(supportRequestDTO, userId);
         }catch(UserAuthenticationException ignored)
         {
@@ -48,9 +48,9 @@ public class SupportRequestController {
     }
 
     @GetMapping("/all-support-requests")
-    public ResponseEntity<List<SupportRequestDTO>> getAllSupportRequests(@CookieValue(value = "chocolateChip", required = false) String sessionId,
+    public ResponseEntity<List<SupportRequestDTO>> getAllSupportRequests(@AuthenticationPrincipal Jwt jwt,
                                                                          @RequestParam(required = false) String status) {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         if (status == null || status.equalsIgnoreCase("All")) {
             List<SupportRequestDTO> fetchedSupportRequests = supportRequestService.getAllSupportRequests();
             return ResponseEntity.ok(fetchedSupportRequests);
@@ -61,60 +61,60 @@ public class SupportRequestController {
     }
 
 	@GetMapping("/{id}")
-	public ResponseEntity<SupportRequestDTO> getSupportRequestById(@CookieValue(value = "chocolateChip", required = false) String sessionId,
+	public ResponseEntity<SupportRequestDTO> getSupportRequestById(@AuthenticationPrincipal Jwt jwt,
                                                                    @PathVariable Integer id) {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         return ResponseEntity.ok(supportRequestService.getSupportRequestById(id, true));
 	}
 
 	@GetMapping("/officer/{id}")
-	public ResponseEntity<SupportRequestDTO> getSupportRequestForOfficerById(@CookieValue(value = "chocolateChip", required = false) String sessionId,
+	public ResponseEntity<SupportRequestDTO> getSupportRequestForOfficerById(@AuthenticationPrincipal Jwt jwt,
                                                                              @PathVariable Integer id) {
-        authService.checkAuth(sessionId, List.of(AccessRole.OFFICER));
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_OFFICER));
         return ResponseEntity.ok(supportRequestService.getSupportRequestById(id, false));
 	}
 
 
     @PutMapping("/update-support-request/{id}")
-    public ResponseEntity<SupportRequestDTO> updateSupportRequest(@CookieValue(value = "chocolateChip", required = false) String sessionId,
+    public ResponseEntity<SupportRequestDTO> updateSupportRequest(@AuthenticationPrincipal Jwt jwt,
                                                   @PathVariable Integer id,
                                                   @RequestBody SupportRequestDTO supportRequestDTO) {
-        Integer userId = authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN));
+        Integer userId = authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN));
         SupportRequestDTO updatedSupportRequest = supportRequestService.updateSupportRequest(userId, id, supportRequestDTO);
         return ResponseEntity.ok(updatedSupportRequest);
     }
 
     @GetMapping("/all-statuses")
-    public ResponseEntity<List<String>> getAllValidStatuses(@CookieValue(value = "chocolateChip", required = false) String sessionId) {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+    public ResponseEntity<List<String>> getAllValidStatuses(@AuthenticationPrincipal Jwt jwt) {
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         List<String> statuses = supportRequestService.getAllStatuses();
         return ResponseEntity.ok(statuses);
     }
 
     @GetMapping("/all-severity")
-    public ResponseEntity<List<Integer>> getAllValidSeverities(@CookieValue(value = "chocolateChip", required = false) String sessionId) {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+    public ResponseEntity<List<Integer>> getAllValidSeverities(@AuthenticationPrincipal Jwt jwt) {
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         List<Integer> severities = supportRequestService.getAllSeverities();
         return ResponseEntity.ok(severities);
     }
 
     @GetMapping("/all-resolution-types")
-    public ResponseEntity<List<String>> getAllValidResolutionTypes(@CookieValue(value = "chocolateChip", required = false) String sessionId) {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+    public ResponseEntity<List<String>> getAllValidResolutionTypes(@AuthenticationPrincipal Jwt jwt) {
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         List<String> resolutionTypes = supportRequestService.getAllResolutionTypes();
         return ResponseEntity.ok(resolutionTypes);
     }
 
     @GetMapping("/all-assignees")
-    public ResponseEntity<List<SupportAssigneeDTO>> getAllValidAssignees(@CookieValue(value = "chocolateChip", required = false) String sessionId) {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+    public ResponseEntity<List<SupportAssigneeDTO>> getAllValidAssignees(@AuthenticationPrincipal Jwt jwt) {
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         List<SupportAssigneeDTO> assignees = supportRequestService.getAllAssignees();
         return ResponseEntity.ok(assignees);
     }
 
     @GetMapping("/download-support-request-report")
-    public ResponseEntity<byte[]> downloadSupportRequestReports(@RequestParam(required = false) String sessionId) throws IOException {
-        authService.checkAuth(sessionId, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.OFFICER));
+    public ResponseEntity<byte[]> downloadSupportRequestReports(@AuthenticationPrincipal Jwt jwt) throws IOException {
+        authenticationService.checkAuth(jwt, List.of(AccessRole.SUPPORT_TEAM, AccessRole.ADMIN, AccessRole.SUPPORT_OFFICER));
         String path = supportRequestService.downloadSupportRequestReportsToCSV();
 
         // Read the CSV file and convert it to a byte array

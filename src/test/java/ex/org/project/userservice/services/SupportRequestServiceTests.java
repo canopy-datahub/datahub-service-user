@@ -1,7 +1,7 @@
 package ex.org.project.userservice.services;
 
-import ex.org.project.userservice.auth.AccessRole;
-import ex.org.project.userservice.auth.UserNotFoundException;
+import ex.org.project.datahub.auth.exception.UserNotFoundException;
+import ex.org.project.datahub.auth.model.AccessRole;
 import ex.org.project.userservice.dto.EmailRequest;
 import ex.org.project.userservice.dto.SupportRequestDTO;
 import ex.org.project.userservice.dto.UserDTO;
@@ -12,7 +12,6 @@ import ex.org.project.userservice.entity.SupportRequest;
 import ex.org.project.userservice.exception.BadRequestException;
 import ex.org.project.userservice.exception.SupportRequestNotFoundException;
 import ex.org.project.userservice.mapper.SupportAssigneeMapper;
-import ex.org.project.userservice.mapper.SupportRequestMapper;
 import ex.org.project.userservice.mapper.SupportRequestMapperImpl;
 import ex.org.project.userservice.repository.*;
 import ex.org.project.userservice.service.MessageService;
@@ -49,7 +48,7 @@ public class SupportRequestServiceTests {
     @Mock
     private UserRoleRepository userRoleRepository;
     @Spy
-    private SupportRequestMapper supportRequestMapper = new SupportRequestMapperImpl();
+    private SupportRequestMapperImpl supportRequestMapper = new SupportRequestMapperImpl();
     @Mock
     private SupportAssigneeMapper supportAssigneeMapper;
     @Mock

@@ -1,28 +1,20 @@
 package ex.org.project.userservice.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import ex.org.project.userservice.auth.AccessRole;
-import ex.org.project.userservice.auth.UserAuthenticationException;
-import ex.org.project.userservice.auth.UserNotFoundException;
-import ex.org.project.userservice.auth.ras.AuthRasTracking;
-import ex.org.project.userservice.auth.ras.AuthRasTrackingRepository;
+import ex.org.project.datahub.auth.exception.UserNotFoundException;
+import ex.org.project.datahub.auth.model.AccessRole;
 import ex.org.project.userservice.dto.*;
 import ex.org.project.userservice.entity.*;
 import ex.org.project.userservice.exception.*;
+import ex.org.project.userservice.mapper.*;
 import ex.org.project.userservice.repository.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import ex.org.project.userservice.mapper.InstitutionMapper;
-import ex.org.project.userservice.mapper.LookupCountryMapper;
-import ex.org.project.userservice.mapper.LookupStateMapper;
-import ex.org.project.userservice.mapper.UserMapper;
-import ex.org.project.userservice.mapper.UserRegistrationMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,7 +34,6 @@ public class UserServiceImpl implements UserService {
 	private final LookupCountryRepository lookupCountryRepository;
 	private final LookupStateRepository lookupStateRepository;
 	private final LookupRoleRepository lookupRoleRepository;
-	private final AuthRasTrackingRepository rasTrackingRepository;
 	private final LkupCenterRepository centerRepository;
 	private final MessageService messageService;
 	private final LkupReferrerRepository lkupReferrerRepository;
@@ -86,17 +77,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional
-	public UserRegistrationDTO saveUserRegistrationForm(String sessionId, UserRegistrationDTO userRegistrationDTO)
+	public UserRegistrationDTO saveUserRegistrationForm(Integer userId, UserRegistrationDTO userRegistrationDTO)
 			throws UserInfoException {
-		//check that the session ID is valid and the user account hasn't already been created
-		AuthRasTracking rasTracking = rasTrackingRepository.findRasTrackingBySessionId(sessionId)
-				.orElseThrow(() -> new UserAuthenticationException("Invalid session ID"));
-
-		if(rasTracking.getEmail() == null) {
-			throw new BadDataException("Session ID is missing a valid email address");
-		}
-		if(userRepository.existsByEmail(rasTracking.getEmail())){
+		// Check if email already exists
+		if(userRegistrationDTO.getEmail() != null && userRepository.existsByEmail(userRegistrationDTO.getEmail())){
 			throw new UserRegistrationFormException("Account already exists");
+		}
+
+		// If authenticated (userId is not null), link to existing user or update
+		if(userId != null) {
+			User existingUser = userRepository.findById(userId).orElse(null);
+			if(existingUser != null && userRepository.existsByEmail(existingUser.getEmail())){
+				throw new UserRegistrationFormException("Account already exists");
+			}
 		}
 
 		Institution institution = institutionRepository.findByName(userRegistrationDTO.getInstitution())
@@ -224,22 +217,6 @@ public class UserServiceImpl implements UserService {
 
 		user.updateUser(userDTO, institution, roles, status, researcherLevel, center);
 		return userMapper.toUserDto(user);
-	}
-
-	public UserDTO getUserInfoBySession(String sessionId) throws UserNotFoundException, BadDataException {
-		// AuthRasTracking rasUser = rasTrackingRepository.findRasTrackingBySessionId(sessionId)
-		// 		.orElseThrow(
-		// 				() -> new UserNotFoundException("Session not found"));
-		AuthRasTracking rasUser = new AuthRasTracking();
-		rasUser.setEmail("ycao77@stanford.edu");
-
-		if(rasUser.getEmail() == null) {
-			throw new BadDataException("Session ID is missing a valid email address");
-		}
-
-		User user = userRepository.findByEmail(rasUser.getEmail())
-				.orElseThrow(() -> new UserNotFoundException("Unable to find user for ras_tracking ID"));
-		return userMapper.toUserDto(user, sessionId);
 	}
 
 	@Transactional

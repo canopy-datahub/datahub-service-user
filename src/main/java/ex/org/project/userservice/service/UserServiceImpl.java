@@ -231,7 +231,7 @@ public class UserServiceImpl implements UserService {
 		// 		.orElseThrow(
 		// 				() -> new UserNotFoundException("Session not found"));
 		AuthRasTracking rasUser = new AuthRasTracking();
-		rasUser.setEmail("ycao77@stanford.edu");
+		rasUser.setEmail("test@test.com");
 
 		if(rasUser.getEmail() == null) {
 			throw new BadDataException("Session ID is missing a valid email address");

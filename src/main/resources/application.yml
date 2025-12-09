@@ -9,7 +9,7 @@ spring:
     open-in-view: false
 
 server:
-  port: 8082
+  port: 8080
   servlet.context-path: /api/user/v1
 
 management:
@@ -54,10 +54,10 @@ redirect:
 
 spring:
   config:
-    #import: aws-secretsmanager:application_dev
+    import: aws-secretsmanager:application_dev
     activate:
       on-profile: dev
-  cloud.aws.region.static: us-west-2
+  cloud.aws.region.static: us-east-1
   jpa:
     show-sql: true
   security:
@@ -82,7 +82,7 @@ spring:
     activate:
       on-profile: test
 
-  cloud.aws.region.static: us-west-2
+  cloud.aws.region.static: us-east-1
 
 logging:
   pattern:
@@ -96,7 +96,7 @@ spring:
     import: aws-secretsmanager:application_prod
     activate:
       on-profile: prod
-  cloud.aws.region.static: us-west-2
+  cloud.aws.region.static: us-east-1
 
 logging:
   pattern:

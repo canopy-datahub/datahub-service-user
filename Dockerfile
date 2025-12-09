@@ -1,8 +1,8 @@
-FROM openjdk:22-ea-17-jdk-slim
+FROM eclipse-temurin:17-jre-jammy
 EXPOSE 8080
 
 ARG CERT
-ARG JAR_FILE={INSERT HERE}
+ARG JAR_FILE=target/datahub-service-user-0.0.1-SNAPSHOT.jar
 
 # Install cURL to perform ECS health check
 RUN apt update && apt install -y curl

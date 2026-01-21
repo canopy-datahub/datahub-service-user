@@ -1,9 +1,7 @@
 package controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -73,7 +71,8 @@ public class SupportRequestControllerTest {
         when(supportRequestService.saveLoggedInUserSupportRequest(any(), any())).thenReturn(requestDTO);
 
         mockMvc.perform(post("/support-request/submit")
-                        .cookie(new Cookie("chocolateChip", "session123"))
+                        // TODO: Add authentication
+                        //.cookie(new Cookie("chocolateChip", "session123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
@@ -91,7 +90,9 @@ public class SupportRequestControllerTest {
         when(supportRequestService.getAllSupportRequests()).thenReturn(supportRequests);
 
         mockMvc.perform(get("/support-request/all-support-requests")
-                        .cookie(new Cookie("chocolateChip", "session123")))
+                        // TODO: Add authentication
+                        // .cookie(new Cookie("chocolateChip", "session123"))
+                        )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].requestTitle").value(supportRequest.getRequestTitle()));
 

@@ -35,70 +35,9 @@ class UserAuthServiceTests {
 
     private UserAuthService userAuthService;
 
-    @Mock
-    private AuthRasService authRasService;
-
     @BeforeEach
     public void setup() {
-        userAuthService = new UserAuthService(authUserRasRepository, authUtilRepository, authRasService);
-    }
-
-    @Test
-    void testCheckAuth_roles_happyPath(){
-        AuthUserDTO authUserDto = new AuthUserDTO();
-        authUserDto.setRoles(List.of("Application Administrator"));
-        authUserDto.setId(8);
-
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUserDto);
-
-        Integer response = userAuthService.checkAuth("123", List.of(AccessRole.ADMIN));
-
-        assertEquals(8, response);
-
-    }
-
-    @Test
-    void testCheckAuth_roles_happyPathNoRoleRequired(){
-        AuthUserDTO authUserDto = new AuthUserDTO();
-        authUserDto.setRoles(List.of("fake role"));
-        authUserDto.setId(8);
-
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUserDto);
-
-        Integer response = userAuthService.checkAuth("123", List.of());
-
-        assertEquals(8, response);
-    }
-
-    @Test
-    void testCheckAuth_roles_invalidRoles(){
-        AuthUserDTO authUserDto = new AuthUserDTO();
-        authUserDto.setRoles(List.of("fake role"));
-        authUserDto.setId(8);
-
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUserDto);
-
-        assertThrows(UserAuthorizationException.class,
-                () -> userAuthService.checkAuth("123", List.of(AccessRole.ADMIN)));
-    }
-
-    @Test
-    void testCheckAuth_happyPath(){
-        AuthUserDTO authUser = new AuthUserDTO();
-        authUser.setRoles(List.of("Admin"));
-        authUser.setStatus("active");
-        authUser.setId(8);
-
-        when(authRasService.getUserInfoBySession("123"))
-                .thenReturn(authUser);
-
-        Integer response = userAuthService.checkAuth("123");
-
-        assertEquals(8, response);
-
+        userAuthService = new UserAuthService(authUserRasRepository, authUtilRepository);
     }
 
     private List<AuthUserRas> getAuthUserRasList(){

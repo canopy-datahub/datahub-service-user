@@ -7,6 +7,12 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${DATAHUB_KEYCLOAK_ISSUER_URI}
+          jwk-set-uri: ${DATAHUB_KEYCLOAK_JWK_SET_URI}
 
 server:
   port: 8080
@@ -39,12 +45,9 @@ logging:
       mvc.method.annotation:
         HttpEntityMethodProcessor: trace
 
-ras:
-  url: ${rasurl}
-  client:
-    id: ${rasclientid}
-    secret: ${rasclientsecret}
-  auth: ${rasauth}
+keycloak:
+  realm: ${DATAHUB_KEYCLOAK_REALM}
+  resource: ${DATAHUB_KEYCLOAK_CLIENT_ID}
 
 redirect:
   url: ${redirecturl}
@@ -93,7 +96,7 @@ logging:
 
 spring:
   config:
-    import: aws-secretsmanager:${AWS_SECRET_NAME}
+    import: aws-secretsmanager:application_prod
     activate:
       on-profile: prod
   cloud.aws.region.static: us-east-1

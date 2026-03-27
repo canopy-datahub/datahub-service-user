@@ -45,7 +45,6 @@ class UserServiceImplTests {
     @Mock private LookupCountryRepository lookupCountryRepository;
     @Mock private LookupStateRepository lookupStateRepository;
     @Mock private LookupRoleRepository lookupRoleRepository;
-    @Mock private AuthRasTrackingRepository rasTrackingRepository;
     @Mock private LkupCenterRepository dccRepository;
     @Mock private MessageService messageService;
     @Mock private LkupReferrerRepository referrerRepository;
@@ -280,7 +279,7 @@ class UserServiceImplTests {
 
     @Test
     void saveUserRegistrationForm_HappyPath() {
-        String sessionId = "session123";
+        Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         AuthRasTracking rasTracking = new AuthRasTracking();
         rasTracking.setEmail(email);
@@ -289,8 +288,6 @@ class UserServiceImplTests {
         user.setId(1);
         user.setEmail(email);
 
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
         when(institutionRepository.findByName(dto.getInstitution()))
@@ -302,14 +299,14 @@ class UserServiceImplTests {
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
 
-        UserRegistrationDTO response = userService.saveUserRegistrationForm(sessionId, dto);
+        UserRegistrationDTO response = userService.saveUserRegistrationForm(userId, dto);
 
         assertEquals("test@bah.com", response.getEmail());
     }
 
     @Test
     void saveUserRegistrationForm_InvalidReferrer() {
-        String sessionId = "session123";
+        Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         AuthRasTracking rasTracking = new AuthRasTracking();
         rasTracking.setEmail(email);
@@ -322,8 +319,6 @@ class UserServiceImplTests {
         user.setId(1);
         user.setEmail(email);
 
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
         when(institutionRepository.findByName(dto.getInstitution()))
@@ -335,82 +330,56 @@ class UserServiceImplTests {
         when(referrerRepository.findAll())
                 .thenReturn(new ArrayList<>());
 
-        assertThrows(UserRegistrationFormException.class, () -> userService.saveUserRegistrationForm(sessionId, dto));
+        assertThrows(UserRegistrationFormException.class, () -> userService.saveUserRegistrationForm(userId, dto));
 
-    }
-
-    @Test
-    void saveUserRegistrationForm_InvalidSession() {
-        String sessionId = "session123";
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.empty());
-        assertThrows(UserAuthenticationException.class,
-                     () -> userService.saveUserRegistrationForm(sessionId, new UserRegistrationDTO()));
-    }
-
-    @Test
-    void saveUserRegistrationForm_RasTrackingNullEmail() {
-        String sessionId = "session123";
-        AuthRasTracking rasTracking = new AuthRasTracking();
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
-
-        assertThrows(BadDataException.class,
-                     () -> userService.saveUserRegistrationForm(sessionId, new UserRegistrationDTO()));
     }
 
     @Test
     void saveUserRegistrationForm_PreexistingAccount() {
-        String sessionId = "session123";
+        Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         AuthRasTracking rasTracking = new AuthRasTracking();
         rasTracking.setEmail(email);
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
         when(userRepository.existsByEmail(email))
                 .thenReturn(true);
         assertThrows(UserRegistrationFormException.class,
-                     () -> userService.saveUserRegistrationForm(sessionId, new UserRegistrationDTO()));
+                     () -> userService.saveUserRegistrationForm(userId, new UserRegistrationDTO()));
     }
 
     @Test
     void saveUserRegistrationForm_MissingRequiredFields() {
-        String sessionId = "session123";
+        Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         AuthRasTracking rasTracking = new AuthRasTracking();
         rasTracking.setEmail(email);
         UserRegistrationDTO dto = getUserRegistrationDto();
         dto.setEmail("");
 
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
         assertThrows(UserRegistrationFormException.class,
-                     () -> userService.saveUserRegistrationForm(sessionId, dto));
+                     () -> userService.saveUserRegistrationForm(userId, dto));
     }
 
     @Test
     void saveUserRegistrationForm_InvalidInstitution() {
-        String sessionId = "session123";
+        Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         AuthRasTracking rasTracking = new AuthRasTracking();
         rasTracking.setEmail(email);
         UserRegistrationDTO dto = getUserRegistrationDto();
 
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
         when(institutionRepository.findByName(dto.getInstitution()))
                 .thenReturn(Optional.empty());
         assertThrows(UserRegistrationFormException.class,
-                     () -> userService.saveUserRegistrationForm(sessionId, dto));
+                     () -> userService.saveUserRegistrationForm(userId, dto));
     }
 
     @Test
     void saveUserRegistrationForm_InvalidResearcherLevel() {
-        String sessionId = "session123";
+        Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
         AuthRasTracking rasTracking = new AuthRasTracking();
         rasTracking.setEmail(email);
@@ -419,8 +388,6 @@ class UserServiceImplTests {
         user.setId(1);
         user.setEmail(email);
 
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
         when(institutionRepository.findByName(dto.getInstitution()))
@@ -431,7 +398,7 @@ class UserServiceImplTests {
                 .thenReturn(Optional.empty());
 
         assertThrows(UserRegistrationFormException.class,
-                     () -> userService.saveUserRegistrationForm(sessionId, dto));
+                     () -> userService.saveUserRegistrationForm(userId, dto));
     }
 
     private InstitutionDTO getInstitutionDto(){
@@ -537,61 +504,6 @@ class UserServiceImplTests {
                 .thenReturn(Optional.empty());
 
         assertThrows(InstitutionCreationException.class, () -> userService.createInstitution(dto));
-    }
-
-    @Test
-    void getUserInfoBySession_HappyPath(){
-        String sessionId = "session123";
-        String email = "test@bah.com";
-        AuthRasTracking rasTracking = new AuthRasTracking();
-        rasTracking.setEmail(email);
-        User user = new User();
-        user.setId(1);
-        user.setEmail(email);
-        Role role = new Role();
-        role.setName(AccessRole.DATA_SUBMITTER.label);
-        user.setRoles(List.of(role));
-
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
-        when(userRepository.findByEmail(email))
-                .thenReturn(Optional.of(user));
-
-        UserDTO response = userService.getUserInfoBySession(sessionId);
-
-        assertEquals(1, response.getId());
-        assertEquals("test@bah.com", response.getEmail());
-        assertEquals(List.of("Data Submitter"), response.getRoles());
-    }
-
-    @Test
-    void getUserInfoBySession_RasTrackingNotFound(){
-        String sessionId = "session123";
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.getUserInfoBySession(sessionId));
-    }
-
-    @Test
-    void getUserInfoBySession_RasTrackingNullEmail(){
-        String sessionId = "session123";
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(new AuthRasTracking()));
-        assertThrows(BadDataException.class, () -> userService.getUserInfoBySession(sessionId));
-    }
-
-    @Test
-    void getUserInfoBySession_UserNotFound(){
-        String sessionId = "session123";
-        String email = "test@bah.com";
-        AuthRasTracking rasTracking = new AuthRasTracking();
-        rasTracking.setEmail(email);
-
-        when(rasTrackingRepository.findRasTrackingBySessionId(sessionId))
-                .thenReturn(Optional.of(rasTracking));
-        when(userRepository.findByEmail(email))
-                .thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.getUserInfoBySession(sessionId));
     }
 
     @Test

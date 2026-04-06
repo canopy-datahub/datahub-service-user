@@ -1,11 +1,8 @@
 # User Service
 
-Spring Boot 3.1 microservice for Data Hub 3.0. It is running on Java 17.
+Spring Boot 3.1 microservice for Canopy. It is running on Java 17.
 
-User Service (as the name implies) handles user related activity. This includes: 
-* RAS
-  * login and logout
-  * passport retrieval and validation
+User Service handles user-related activity. This includes:
 * Support requests
   * user submission
   * support team ticket assignment and updates
@@ -21,9 +18,9 @@ User Service (as the name implies) handles user related activity. This includes:
 
 If running a cloud configuration locally, AWS CLI needs to be installed and configured.
 
-There are a few environment variable that need to be set in AWS Secrets Manager:
+There are a few environment variables that need to be set in AWS Secrets Manager:
 * dbuser
-    * Open Search hostname / url
+    * database username
 * password
     * database password for dbuser
 * host
@@ -33,19 +30,11 @@ There are a few environment variable that need to be set in AWS Secrets Manager:
 * dbname
     * database name
 * supportEmail
-    * email address used to send support related emails to users and support staff
+    * email address used to send support-related emails to users and support staff
 * EmailQueue
     * SQS queue where email requests are being sent
-* rasurl
-  * hostname of the RAS system
-* rasclientid
-  * ras provided data hub client ID
-* rasclientsecret
-  * ras provided data hub client secret
-* rasauth
-  * post ras auth url to redirect users back to our system when the ras login code is null
 * redirecturl
-  * post ras auth url to redirect users back to our system
+  * post-auth URL to redirect users back to the application after Keycloak login
 
 In a specific instance, the only environment variable that needs to be set is:
 * spring_profiles_active

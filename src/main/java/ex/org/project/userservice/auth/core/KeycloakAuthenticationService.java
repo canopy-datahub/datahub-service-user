@@ -1,5 +1,6 @@
 package ex.org.project.userservice.auth.core;
 
+import ex.org.project.userservice.auth.UserAuthenticationException;
 import ex.org.project.userservice.auth.UserAuthorizationException;
 import ex.org.project.userservice.auth.AccessRole;
 import ex.org.project.userservice.auth.AuthLookupStatus;
@@ -69,6 +70,9 @@ public class KeycloakAuthenticationService {
      */
     @Transactional
     public AuthUser getAuthenticatedUser(Jwt jwt) {
+        if (jwt == null) {
+            throw new UserAuthenticationException("No authentication token provided");
+        }
         String keycloakUuid = keycloakJwtService.extractSubject(jwt);
         log.debug("Authenticating user with Keycloak UUID: {}", keycloakUuid);
 

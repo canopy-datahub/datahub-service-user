@@ -23,6 +23,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "uuid", unique = true)
+    private String uuid;
+
     @Column(name = "first_name")
     private String firstName;
 

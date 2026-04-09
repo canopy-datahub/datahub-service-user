@@ -1,11 +1,13 @@
 package ex.org.project.userservice.mapper;
 
-import ex.org.project.userservice.dto.SupportRequestDTO;
-import ex.org.project.userservice.entity.SupportRequest;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-import java.util.List;
+import ex.org.project.userservice.dto.SupportRequestDTO;
+import ex.org.project.userservice.entity.SupportRequest;
 
 @Mapper(componentModel = "spring")
 public interface SupportRequestMapper {
@@ -15,9 +17,9 @@ public interface SupportRequestMapper {
     @Mapping(source = "requestType.name", target = "requestType")
     @Mapping(source = "notes", target = "notes")
     SupportRequestDTO toSupportRequestDto(SupportRequest supportRequest);
-
+    
     List<SupportRequestDTO> toDTOs(List<SupportRequest> supportRequests);
-
+    
     //SupportRequest fromSupportRequestDto(SupportRequestDTO supportRequestDTO);
 }
 

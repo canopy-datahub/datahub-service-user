@@ -1,20 +1,25 @@
 package ex.org.project.userservice.service;
 
-import ex.org.project.datahub.auth.exception.UserNotFoundException;
-import ex.org.project.datahub.auth.model.AccessRole;
-import ex.org.project.userservice.dto.*;
-import ex.org.project.userservice.entity.*;
-import ex.org.project.userservice.exception.*;
-import ex.org.project.userservice.mapper.*;
-import ex.org.project.userservice.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import ex.org.project.userservice.auth.AccessRole;
+import ex.org.project.userservice.auth.UserNotFoundException;
+import ex.org.project.userservice.dto.*;
+import ex.org.project.userservice.entity.*;
+import ex.org.project.userservice.exception.*;
+import ex.org.project.userservice.repository.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import ex.org.project.userservice.mapper.InstitutionMapper;
+import ex.org.project.userservice.mapper.LookupCountryMapper;
+import ex.org.project.userservice.mapper.LookupStateMapper;
+import ex.org.project.userservice.mapper.UserMapper;
+import ex.org.project.userservice.mapper.UserRegistrationMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -76,21 +81,21 @@ public class UserServiceImpl implements UserService {
 		return institutionMapper.toInstitutionDto(savedInstitution);
 	}
 
-	@Transactional
-	public UserRegistrationDTO saveUserRegistrationForm(Integer userId, UserRegistrationDTO userRegistrationDTO)
-			throws UserInfoException {
-		// Check if email already exists
-		if(userRegistrationDTO.getEmail() != null && userRepository.existsByEmail(userRegistrationDTO.getEmail())){
-			throw new UserRegistrationFormException("Account already exists");
-		}
+  @Transactional
+  public UserRegistrationDTO saveUserRegistrationForm(Integer userId, UserRegistrationDTO userRegistrationDTO)
+      throws UserInfoException {
+    // Check if email already exists
+    if(userRegistrationDTO.getEmail() != null && userRepository.existsByEmail(userRegistrationDTO.getEmail())){
+      throw new UserRegistrationFormException("Account already exists");
+    }
 
-		// If authenticated (userId is not null), link to existing user or update
-		if(userId != null) {
-			User existingUser = userRepository.findById(userId).orElse(null);
-			if(existingUser != null && userRepository.existsByEmail(existingUser.getEmail())){
-				throw new UserRegistrationFormException("Account already exists");
-			}
-		}
+    // If authenticated (userId is not null), link to the existing user or update
+    if(userId != null) {
+      User existingUser = userRepository.findById(userId).orElse(null);
+      if(existingUser != null && userRepository.existsByEmail(existingUser.getEmail())){
+        throw new UserRegistrationFormException("Account already exists");
+      }
+    }
 
 		Institution institution = institutionRepository.findByName(userRegistrationDTO.getInstitution())
 				.orElseThrow(() -> new UserRegistrationFormException("Invalid Institution"));

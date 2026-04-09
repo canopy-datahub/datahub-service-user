@@ -1,10 +1,17 @@
 package controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ex.org.project.datahub.auth.core.FileAuthorizationService;
-import ex.org.project.userservice.controller.SupportRequestController;
-import ex.org.project.userservice.dto.SupportRequestDTO;
-import ex.org.project.userservice.service.SupportRequestService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Collections;
+import java.util.List;
+
+import ex.org.project.userservice.auth.UserAuthService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,14 +22,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import ex.org.project.userservice.controller.SupportRequestController;
+import ex.org.project.userservice.dto.SupportRequestDTO;
+import ex.org.project.userservice.service.SupportRequestService;
 
 public class SupportRequestControllerTest {
 
@@ -32,7 +36,7 @@ public class SupportRequestControllerTest {
     private SupportRequestService supportRequestService;
 
     @Mock
-    private FileAuthorizationService fileAuthorizationService;
+    private UserAuthService authService;
 
     @InjectMocks
     private SupportRequestController supportRequestController;
@@ -67,7 +71,8 @@ public class SupportRequestControllerTest {
         when(supportRequestService.saveLoggedInUserSupportRequest(any(), any())).thenReturn(requestDTO);
 
         mockMvc.perform(post("/support-request/submit")
-                        .cookie(new Cookie("chocolateChip", "session123"))
+                        // TODO: Add authentication
+                        //.cookie(new Cookie("chocolateChip", "session123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
@@ -85,7 +90,9 @@ public class SupportRequestControllerTest {
         when(supportRequestService.getAllSupportRequests()).thenReturn(supportRequests);
 
         mockMvc.perform(get("/support-request/all-support-requests")
-                        .cookie(new Cookie("chocolateChip", "session123")))
+                        // TODO: Add authentication
+                        // .cookie(new Cookie("chocolateChip", "session123"))
+                        )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].requestTitle").value(supportRequest.getRequestTitle()));
 

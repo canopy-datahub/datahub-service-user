@@ -15,7 +15,7 @@ spring:
           jwk-set-uri: ${DATAHUB_KEYCLOAK_JWK_SET_URI}
 
 server:
-  port: 8082
+  port: 8080
   servlet.context-path: /api/user/v1
 
 management:
@@ -28,7 +28,6 @@ management:
   endpoints:
     enabled-by-default: false
     web:
-      base-path: /actuator
       exposure:
         include: health,shutdown
 
@@ -50,26 +49,18 @@ keycloak:
   realm: ${DATAHUB_KEYCLOAK_REALM}
   resource: ${DATAHUB_KEYCLOAK_CLIENT_ID}
 
-# RAS configuration - DEPRECATED (kept for reference during migration)
-# ras:
-#   url: ${rasurl}
-#   client:
-#     id: ${rasclientid}
-#     secret: ${rasclientsecret}
-#   auth: ${rasauth}
-#
-# redirect:
-#   url: ${redirecturl}
+redirect:
+  url: ${redirecturl}
 
 ---
 # DEV
 
 spring:
   config:
-    #import: aws-secretsmanager:application_dev
+    import: aws-secretsmanager:${AWS_SECRET_NAME}
     activate:
       on-profile: dev
-  cloud.aws.region.static: us-west-2
+  cloud.aws.region.static: us-east-1
   jpa:
     show-sql: true
   security:
@@ -90,11 +81,11 @@ logging:
 
 spring:
   config:
-    import: aws-secretsmanager:application_test
+    import: aws-secretsmanager:${AWS_SECRET_NAME}
     activate:
       on-profile: test
 
-  cloud.aws.region.static: us-west-2
+  cloud.aws.region.static: us-east-1
 
 logging:
   pattern:
@@ -108,7 +99,7 @@ spring:
     import: aws-secretsmanager:application_prod
     activate:
       on-profile: prod
-  cloud.aws.region.static: us-west-2
+  cloud.aws.region.static: us-east-1
 
 logging:
   pattern:

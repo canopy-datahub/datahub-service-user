@@ -1,9 +1,6 @@
 package ex.org.project.userservice.auth;
 
-import ex.org.project.datahub.auth.core.FileAuthorizationService;
-import ex.org.project.datahub.auth.exception.UserAuthorizationException;
-import ex.org.project.datahub.auth.model.AuthUserRas;
-import ex.org.project.datahub.auth.repository.AuthUtilRepository;
+import ex.org.project.userservice.auth.ras.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,106 +9,124 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserAuthServiceTests {
 
-  @Mock
-  private AuthUtilRepository authUtilRepository;
+    @Mock
+    private AuthRasTrackingRepository authRasTrackingRepository;
 
-  private FileAuthorizationService fileAuthorizationService;
+    @Mock
+    private AuthUserRepository authUserRepository;
 
-  @BeforeEach
-  public void setup() {
-    fileAuthorizationService = new FileAuthorizationService(authUtilRepository);
-  }
+    @Mock
+    private AuthUserRasRepository authUserRasRepository;
 
-  private List<AuthUserRas> getAuthUserRasList() {
-    AuthUserRas userRas1 = new AuthUserRas(10, "phs001111", 1);
-    AuthUserRas userRas2 = new AuthUserRas(10, "phs001112", 1);
-    AuthUserRas userRas3 = new AuthUserRas(10, "phs001113", 1);
-    return List.of(userRas1, userRas2, userRas3);
-  }
+    @Mock
+    private AuthUtilRepository authUtilRepository;
 
-  @Test
-  void testCheckFileAuthorization_happyPath() {
-    List<AuthUserRas> userRasMock = getAuthUserRasList();
-    List<String> phsNumbersMock = List.of("phs001111", "phs001112", "phs001113");
-    Integer userId = 1;
-    List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
+    private final AuthUserMapper authUserMapper = new AuthUserMapperImpl();
 
-    when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
-        .thenReturn(dataFileIds);
-    when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
-        .thenReturn(phsNumbersMock);
+    private UserAuthService userAuthService;
 
-    boolean response = fileAuthorizationService.checkFileAuthorization(userId, dataFileIds);
+    @BeforeEach
+    public void setup() {
+        userAuthService = new UserAuthService(authUserRasRepository, authUtilRepository);
+    }
 
-    assertTrue(response);
-  }
+    private List<AuthUserRas> getAuthUserRasList(){
+        AuthUserRas userRas1 = new AuthUserRas(10, "phs001111", 1);
+        AuthUserRas userRas2 = new AuthUserRas(10, "phs001112", 1);
+        AuthUserRas userRas3 = new AuthUserRas(10, "phs001113", 1);
+        return List.of(userRas1, userRas2, userRas3);
+    }
 
-  @Test
-  void testCheckFileAuthorization_partialStudyAuthorization() {
-    List<AuthUserRas> userRasMock = List.of(new AuthUserRas(10, "phs001111", 1));
-    List<String> phsNumbersMock = List.of("phs001111", "phs001112", "phs001113");
-    Integer userId = 1;
-    List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
+    @Test
+    void testCheckFileAuthorization_happyPath(){
+        List<AuthUserRas> userRasMock = getAuthUserRasList();
+        List<String> phsNumbersMock = List.of("phs001111", "phs001112", "phs001113");
+        Integer userId = 1;
+        List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
 
-    when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
-        .thenReturn(dataFileIds);
-    when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
-        .thenReturn(phsNumbersMock);
+        when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
+                .thenReturn(dataFileIds);
+        when(authUserRasRepository.findAllByUserId(userId))
+                .thenReturn(userRasMock);
+        when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
+                .thenReturn(phsNumbersMock);
 
-    assertThrows(UserAuthorizationException.class,
-        () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
-    );
-  }
+        boolean response = userAuthService.checkFileAuthorization(userId, dataFileIds);
 
-  @Test
-  void testCheckFileAuthorization_noStudyAuthorization() {
-    List<AuthUserRas> userRasMock = new ArrayList<>();
-    List<String> phsNumbersMock = List.of("phs001111", "phs001112", "phs001113");
-    Integer userId = 1;
-    List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
+        assertTrue(response);
+    }
 
-    when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
-        .thenReturn(dataFileIds);
-    when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
-        .thenReturn(phsNumbersMock);
+    @Test
+    void testCheckFileAuthorization_partialStudyAuthorization(){
+        List<AuthUserRas> userRasMock = List.of(new AuthUserRas(10, "phs001111", 1));
+        List<String> phsNumbersMock = List.of("phs001111", "phs001112", "phs001113");
+        Integer userId = 1;
+        List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
 
-    assertThrows(UserAuthorizationException.class,
-        () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
-    );
-  }
+        when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
+                .thenReturn(dataFileIds);
+        when(authUserRasRepository.findAllByUserId(userId))
+                .thenReturn(userRasMock);
+        when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
+                .thenReturn(phsNumbersMock);
 
-  @Test
-  void testCheckFileAuthorization_allUnapprovedFiles() {
-    Integer userId = 1;
-    List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
+        assertThrows(UserAuthorizationException.class,
+                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+        );
+    }
 
-    when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
-        .thenReturn(new ArrayList<>());
+    @Test
+    void testCheckFileAuthorization_noStudyAuthorization(){
+        List<AuthUserRas> userRasMock = new ArrayList<>();
+        List<String> phsNumbersMock = List.of("phs001111", "phs001112", "phs001113");
+        Integer userId = 1;
+        List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
 
-    assertThrows(UserAuthorizationException.class,
-        () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
-    );
-  }
+        when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
+                .thenReturn(dataFileIds);
+        when(authUserRasRepository.findAllByUserId(userId))
+                .thenReturn(userRasMock);
+        when(authUtilRepository.findPhsNumbersOfFilesIn(anyList()))
+                .thenReturn(phsNumbersMock);
 
-  @Test
-  void testCheckFileAuthorization_someUnapprovedFiles() {
-    Integer userId = 1;
-    List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
+        assertThrows(UserAuthorizationException.class,
+                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+        );
+    }
 
-    when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
-        .thenReturn(List.of(1, 2, 3, 4));
+    @Test
+    void testCheckFileAuthorization_allUnapprovedFiles(){
+        Integer userId = 1;
+        List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
 
-    assertThrows(UserAuthorizationException.class,
-        () -> fileAuthorizationService.checkFileAuthorization(userId, dataFileIds)
-    );
-  }
+        when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
+                .thenReturn(new ArrayList<>());
+
+        assertThrows(UserAuthorizationException.class,
+                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+        );
+    }
+
+    @Test
+    void testCheckFileAuthorization_someUnapprovedFiles(){
+        Integer userId = 1;
+        List<Integer> dataFileIds = List.of(1, 2, 3, 4, 5);
+
+        when(authUtilRepository.findAllApprovedFileIdsIn(dataFileIds))
+                .thenReturn(List.of(1, 2, 3, 4));
+
+        assertThrows(UserAuthorizationException.class,
+                () -> userAuthService.checkFileAuthorization(userId, dataFileIds)
+        );
+    }
 }

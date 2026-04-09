@@ -1,16 +1,13 @@
 package ex.org.project.userservice.services;
 
-import ex.org.project.datahub.auth.exception.UserNotFoundException;
-import ex.org.project.datahub.auth.model.AccessRole;
-import ex.org.project.userservice.dto.InstitutionDTO;
-import ex.org.project.userservice.dto.ReferrerSelectionDTO;
-import ex.org.project.userservice.dto.UserDTO;
-import ex.org.project.userservice.dto.UserRegistrationDTO;
+import ex.org.project.userservice.auth.AccessRole;
+import ex.org.project.userservice.auth.UserAuthenticationException;
+import ex.org.project.userservice.auth.UserNotFoundException;
+import ex.org.project.userservice.auth.ras.AuthRasTracking;
+import ex.org.project.userservice.auth.ras.AuthRasTrackingRepository;
+import ex.org.project.userservice.dto.*;
 import ex.org.project.userservice.entity.*;
-import ex.org.project.userservice.exception.InstitutionCreationException;
-import ex.org.project.userservice.exception.SubmitterCenterException;
-import ex.org.project.userservice.exception.UserInfoException;
-import ex.org.project.userservice.exception.UserRegistrationFormException;
+import ex.org.project.userservice.exception.*;
 import ex.org.project.userservice.mapper.*;
 import ex.org.project.userservice.repository.*;
 import ex.org.project.userservice.service.MessageService;
@@ -34,9 +31,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTests {
 
-    @Spy private UserMapperImpl userMapper = new UserMapperImpl();
-    @Spy private UserRegistrationMapperImpl userRegistrationMapper = new UserRegistrationMapperImpl();
-    @Spy private InstitutionMapperImpl institutionMapper = new InstitutionMapperImpl();
+    @Spy private UserMapper userMapper = new UserMapperImpl();
+    @Spy private UserRegistrationMapper userRegistrationMapper = new UserRegistrationMapperImpl();
+    @Spy private InstitutionMapper institutionMapper = new InstitutionMapperImpl();
 
     @Mock private LookupStateMapper lookupStateMapper;
     @Mock private LookupCountryMapper lookupCountryMapper;
@@ -284,6 +281,8 @@ class UserServiceImplTests {
     void saveUserRegistrationForm_HappyPath() {
         Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
+        AuthRasTracking rasTracking = new AuthRasTracking();
+        rasTracking.setEmail(email);
         UserRegistrationDTO dto = getUserRegistrationDto();
         User user = new User();
         user.setId(1);
@@ -309,6 +308,8 @@ class UserServiceImplTests {
     void saveUserRegistrationForm_InvalidReferrer() {
         Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
+        AuthRasTracking rasTracking = new AuthRasTracking();
+        rasTracking.setEmail(email);
         UserRegistrationDTO dto = getUserRegistrationDto();
         var referrer = new ReferrerSelectionDTO();
         referrer.setReferrerId(1);
@@ -337,11 +338,25 @@ class UserServiceImplTests {
     void saveUserRegistrationForm_PreexistingAccount() {
         Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
-        UserRegistrationDTO dto = getUserRegistrationDto();
-
+        AuthRasTracking rasTracking = new AuthRasTracking();
+        rasTracking.setEmail(email);
         when(userRepository.existsByEmail(email))
                 .thenReturn(true);
+        assertThrows(UserRegistrationFormException.class,
+                     () -> userService.saveUserRegistrationForm(userId, new UserRegistrationDTO()));
+    }
 
+    @Test
+    void saveUserRegistrationForm_MissingRequiredFields() {
+        Integer userId = null; // Anonymous registration
+        String email = "test@bah.com";
+        AuthRasTracking rasTracking = new AuthRasTracking();
+        rasTracking.setEmail(email);
+        UserRegistrationDTO dto = getUserRegistrationDto();
+        dto.setEmail("");
+
+        when(userRepository.existsByEmail(email))
+                .thenReturn(false);
         assertThrows(UserRegistrationFormException.class,
                      () -> userService.saveUserRegistrationForm(userId, dto));
     }
@@ -350,13 +365,14 @@ class UserServiceImplTests {
     void saveUserRegistrationForm_InvalidInstitution() {
         Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
+        AuthRasTracking rasTracking = new AuthRasTracking();
+        rasTracking.setEmail(email);
         UserRegistrationDTO dto = getUserRegistrationDto();
 
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
         when(institutionRepository.findByName(dto.getInstitution()))
                 .thenReturn(Optional.empty());
-
         assertThrows(UserRegistrationFormException.class,
                      () -> userService.saveUserRegistrationForm(userId, dto));
     }
@@ -365,7 +381,12 @@ class UserServiceImplTests {
     void saveUserRegistrationForm_InvalidResearcherLevel() {
         Integer userId = null; // Anonymous registration
         String email = "test@bah.com";
+        AuthRasTracking rasTracking = new AuthRasTracking();
+        rasTracking.setEmail(email);
         UserRegistrationDTO dto = getUserRegistrationDto();
+        User user = new User();
+        user.setId(1);
+        user.setEmail(email);
 
         when(userRepository.existsByEmail(email))
                 .thenReturn(false);
@@ -379,7 +400,6 @@ class UserServiceImplTests {
         assertThrows(UserRegistrationFormException.class,
                      () -> userService.saveUserRegistrationForm(userId, dto));
     }
-
 
     private InstitutionDTO getInstitutionDto(){
         InstitutionDTO dto = new InstitutionDTO();

@@ -1,8 +1,8 @@
 package ex.org.project.userservice.controller;
 
-import ex.org.project.datahub.auth.exception.UserAuthenticationException;
-import ex.org.project.datahub.auth.exception.UserAuthorizationException;
-import ex.org.project.datahub.auth.exception.UserNotFoundException;
+import ex.org.project.userservice.auth.UserAuthenticationException;
+import ex.org.project.userservice.auth.UserAuthorizationException;
+import ex.org.project.userservice.auth.UserNotFoundException;
 import ex.org.project.userservice.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

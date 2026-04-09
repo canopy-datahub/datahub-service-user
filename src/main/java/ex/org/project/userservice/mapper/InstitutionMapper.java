@@ -1,11 +1,12 @@
 package ex.org.project.userservice.mapper;
 
-import ex.org.project.userservice.dto.InstitutionDTO;
-import ex.org.project.userservice.entity.Institution;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
+import ex.org.project.userservice.dto.InstitutionDTO;
+import ex.org.project.userservice.entity.Institution;
 
 @Mapper(componentModel = "spring")
 public interface InstitutionMapper {
@@ -16,7 +17,7 @@ public interface InstitutionMapper {
     @Mapping(target = "state", source = "state.name")
     @Mapping(target = "province", source = "province")
     InstitutionDTO toInstitutionDto(Institution institution);
-
+    
     List<InstitutionDTO> toInstitutionDTOs(List<Institution> institutions);
 
 }

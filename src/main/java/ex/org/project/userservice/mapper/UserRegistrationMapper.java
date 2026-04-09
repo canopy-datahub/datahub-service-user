@@ -1,13 +1,14 @@
 package ex.org.project.userservice.mapper;
 
 import ex.org.project.userservice.dto.LkupReferrerDTO;
-import ex.org.project.userservice.dto.UserRegistrationDTO;
 import ex.org.project.userservice.entity.Institution;
 import ex.org.project.userservice.entity.LkupReferrer;
 import ex.org.project.userservice.entity.LookupResearcherLevel;
-import ex.org.project.userservice.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import ex.org.project.userservice.dto.UserRegistrationDTO;
+import ex.org.project.userservice.entity.User;
 
 import java.util.List;
 

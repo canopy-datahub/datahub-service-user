@@ -1,13 +1,12 @@
 package ex.org.project.userservice.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import ex.org.project.userservice.entity.LookupStatus;
+import ex.org.project.userservice.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import ex.org.project.userservice.entity.User;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {

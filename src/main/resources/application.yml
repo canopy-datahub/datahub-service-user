@@ -28,6 +28,7 @@ management:
   endpoints:
     enabled-by-default: false
     web:
+      base-path: /actuator
       exposure:
         include: health,shutdown
 
@@ -49,8 +50,16 @@ keycloak:
   realm: ${DATAHUB_KEYCLOAK_REALM}
   resource: ${DATAHUB_KEYCLOAK_CLIENT_ID}
 
-redirect:
-  url: ${redirecturl}
+# RAS configuration - DEPRECATED (kept for reference during migration)
+# ras:
+#   url: ${rasurl}
+#   client:
+#     id: ${rasclientid}
+#     secret: ${rasclientsecret}
+#   auth: ${rasauth}
+#
+# redirect:
+#   url: ${redirecturl}
 
 ---
 # DEV
